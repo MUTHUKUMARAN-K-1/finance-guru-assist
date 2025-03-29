@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { aiChatHistory as importedChatHistory, aiModels } from "@/data/mockData";
+import { generateAIResponse } from "@/utils/aiUtils";
 
 type Message = {
   role: "assistant" | "user";
@@ -58,6 +59,9 @@ const AdvisorChat = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [systemPrompt, setSystemPrompt] = useState(
+    "You are a knowledgeable financial advisor focused on providing clear, accurate financial advice. Always consider the user's financial goals, risk tolerance, and time horizon. Provide balanced perspectives and avoid extreme positions. When uncertain, acknowledge limitations and suggest seeking professional advice."
+  );
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -92,11 +96,11 @@ const AdvisorChat = () => {
     setInputMessage("");
     setIsSending(true);
     
-    // Simulate AI response after a short delay
+    // Simulate AI response after a short delay with enhanced AI response generation
     setTimeout(() => {
       const aiResponse: Message = {
         role: "assistant",
-        content: getSimulatedResponse(inputMessage),
+        content: generateAIResponse(inputMessage),
         timestamp: new Date().toISOString(),
       };
       
@@ -131,23 +135,39 @@ const AdvisorChat = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
-  // Simulated AI response based on user input
-  const getSimulatedResponse = (userInput: string): string => {
-    const userInputLower = userInput.toLowerCase();
+  // Suggested topics based on financial categories
+  const suggestedTopics = [
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Emergency Fund Basics" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Debt Reduction Strategies" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Beginner Investment Guide" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Budgeting Best Practices" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Retirement Planning" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Credit Score Improvement" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "Tax Optimization Tips" },
+    { icon: <Lightbulb className="h-4 w-4" />, text: "First-Time Homebuyer Guide" },
+  ];
+  
+  const handleSuggestedTopic = (topic: string) => {
+    const newUserMessage: Message = {
+      role: "user",
+      content: `Tell me about ${topic}`,
+      timestamp: new Date().toISOString(),
+    };
     
-    if (userInputLower.includes("budget") || userInputLower.includes("spending")) {
-      return "Creating a budget is a great first step to financial wellness. I recommend using the 50/30/20 rule: 50% for needs, 30% for wants, and 20% for savings and debt repayment. Would you like me to help you set up a basic budget based on your income?";
-    } else if (userInputLower.includes("invest") || userInputLower.includes("stock")) {
-      return "Investment strategies should be tailored to your goals, timeline, and risk tolerance. For beginners, I typically recommend starting with low-cost index funds that provide broad market exposure. Would you like more specific investment recommendations based on your situation?";
-    } else if (userInputLower.includes("debt") || userInputLower.includes("loan")) {
-      return "When dealing with debt, you have two main strategies: the snowball method (paying smallest debts first) or the avalanche method (paying highest-interest debts first). The avalanche method saves more money, but the snowball method provides psychological wins. Which approach appeals to you more?";
-    } else if (userInputLower.includes("save") || userInputLower.includes("emergency")) {
-      return "Building an emergency fund should be a top priority. Aim to save 3-6 months of essential expenses in a readily accessible account. This provides financial security and prevents you from going into debt when unexpected expenses arise. Would you like help calculating your target emergency fund amount?";
-    } else if (userInputLower.includes("retire") || userInputLower.includes("401k")) {
-      return "Retirement planning is about balancing current needs with future security. I generally recommend contributing at least enough to get any employer match on retirement accounts, then working toward maxing out tax-advantaged accounts like 401(k)s and IRAs. Would you like to discuss retirement planning strategies in more detail?";
-    } else {
-      return "That's a great financial question. To give you the most helpful advice, could you provide a bit more information about your specific situation? Details about your financial goals, timeline, and current financial status would help me tailor my response.";
-    }
+    setMessages([...messages, newUserMessage]);
+    setIsSending(true);
+    
+    // Simulate AI response for suggested topic
+    setTimeout(() => {
+      const aiResponse: Message = {
+        role: "assistant",
+        content: generateAIResponse(`Tell me about ${topic}`),
+        timestamp: new Date().toISOString(),
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+      setIsSending(false);
+    }, 1500);
   };
   
   return (
@@ -223,7 +243,8 @@ const AdvisorChat = () => {
                       id="system-prompt"
                       placeholder="Customize the AI's behavior with a system prompt"
                       className="min-h-[120px]"
-                      defaultValue="You are a knowledgeable financial advisor focused on providing clear, accurate financial advice. Always consider the user's financial goals, risk tolerance, and time horizon. Provide balanced perspectives and avoid extreme positions. When uncertain, acknowledge limitations and suggest seeking professional advice."
+                      value={systemPrompt}
+                      onChange={(e) => setSystemPrompt(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
                       The system prompt helps define how the AI responds to your financial questions.
@@ -353,58 +374,41 @@ const AdvisorChat = () => {
         <div className="w-64 border-l hidden lg:block overflow-y-auto p-4">
           <h3 className="font-medium mb-3">Suggested Topics</h3>
           <div className="space-y-2">
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span>Emergency Fund Basics</span>
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span>Debt Reduction Strategies</span>
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span>Beginner Investment Guide</span>
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span>Budgeting Best Practices</span>
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                <span>Retirement Planning</span>
-              </div>
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            {suggestedTopics.map((topic, index) => (
+              <button 
+                key={index}
+                className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors flex items-center justify-between"
+                onClick={() => handleSuggestedTopic(topic.text)}
+              >
+                <div className="flex items-center gap-2">
+                  {topic.icon}
+                  <span>{topic.text}</span>
+                </div>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            ))}
           </div>
           
           <Separator className="my-4" />
           
           <h3 className="font-medium mb-3">Recently Asked</h3>
           <div className="space-y-2">
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors">
+            <button 
+              className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors"
+              onClick={() => handleSuggestedTopic("retirement planning")}
+            >
               How much should I save for retirement?
             </button>
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors">
+            <button 
+              className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors"
+              onClick={() => handleSuggestedTopic("Roth vs Traditional IRA")}
+            >
               What's the difference between a Roth and Traditional IRA?
             </button>
-            <button className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors">
+            <button 
+              className="text-sm text-left w-full p-2 rounded-md hover:bg-muted transition-colors"
+              onClick={() => handleSuggestedTopic("improve credit score")}
+            >
               How do I improve my credit score?
             </button>
           </div>
