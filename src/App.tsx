@@ -1,9 +1,20 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+import Layout from "./components/layout/Layout";
+import Dashboard from "./pages/Dashboard";
+import Budget from "./pages/Budget";
+import Investments from "./pages/Investments";
+import Goals from "./pages/Goals";
+import Stocks from "./pages/Stocks";
+import Education from "./pages/Education";
+import Resources from "./pages/Resources";
+import AdvisorChat from "./pages/AdvisorChat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -14,11 +25,21 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <SidebarProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="/budget" element={<Budget />} />
+              <Route path="/investments" element={<Investments />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/stocks" element={<Stocks />} />
+              <Route path="/education" element={<Education />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/advisor" element={<AdvisorChat />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </SidebarProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
