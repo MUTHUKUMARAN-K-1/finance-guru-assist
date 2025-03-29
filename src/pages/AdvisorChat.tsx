@@ -30,7 +30,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { aiChatHistory, aiModels } from "@/data/mockData";
+import { aiChatHistory as importedChatHistory, aiModels } from "@/data/mockData";
 
 type Message = {
   role: "assistant" | "user";
@@ -44,6 +44,12 @@ type AIModel = {
   type: string;
   description: string;
 };
+
+// Convert imported chat history to the correct Message type
+const aiChatHistory: Message[] = importedChatHistory.map(message => ({
+  ...message,
+  role: message.role as "assistant" | "user"
+}));
 
 const AdvisorChat = () => {
   const [messages, setMessages] = useState<Message[]>(aiChatHistory);
