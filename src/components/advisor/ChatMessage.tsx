@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { User, Bot, Copy, CheckCircle2 } from "lucide-react";
+import { User, Bot, Copy, CheckCircle2, Code } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
@@ -34,6 +35,61 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
     setCopied(true);
   };
   
+  // Check if content contains code blocks
+  const hasCodeBlock = content.includes("```");
+  
+  // Parse content for code blocks
+  const renderContent = () => {
+    if (!hasCodeBlock) {
+      return <p className="mb-0 leading-relaxed whitespace-pre-line">{content}</p>;
+    }
+    
+    // Split by code blocks
+    const segments = content.split(/(```[a-z]*\n[\s\S]*?\n```)/g);
+    
+    return segments.map((segment, index) => {
+      // Check if this segment is a code block
+      if (segment.startsWith("```") && segment.endsWith("```")) {
+        // Extract language and code
+        const match = segment.match(/```([a-z]*)\n([\s\S]*?)\n```/);
+        
+        if (match) {
+          const [, language, code] = match;
+          
+          return (
+            <div key={index} className="my-2 relative">
+              <div className="flex justify-between items-center bg-slate-800 px-4 py-1 text-xs text-slate-100 rounded-t-md">
+                <span>{language || "Code"}</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 text-slate-100 hover:text-white hover:bg-slate-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(code);
+                    setCopied(true);
+                  }}
+                >
+                  {copied ? (
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+              <pre className="bg-slate-900 text-slate-100 p-4 rounded-b-md overflow-x-auto">
+                <code>{code}</code>
+              </pre>
+            </div>
+          );
+        }
+      }
+      
+      // Regular text
+      return <p key={index} className="mb-2 leading-relaxed whitespace-pre-line">{segment}</p>;
+    });
+  };
+  
   return (
     <div 
       className={`flex gap-3 ${
@@ -53,9 +109,7 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
       }`}>
         <div className="space-y-2">
           <div className="prose dark:prose-invert">
-            <p className="mb-0 leading-relaxed whitespace-pre-line">
-              {content}
-            </p>
+            {renderContent()}
           </div>
           <div className={`flex items-center justify-between pt-2 text-xs ${
             role === "assistant" ? "text-muted-foreground" : "text-primary-foreground/70"
