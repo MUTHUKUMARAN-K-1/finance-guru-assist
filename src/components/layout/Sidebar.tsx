@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ArrowLeftRight,
-  Bank,
+  BuildingBank,
   BarChart3,
   BookOpen,
   ChevronRight,
@@ -24,12 +24,20 @@ import {
 } from "lucide-react";
 
 const Sidebar = () => {
-  const { isOpen, toggle } = useSidebar();
+  const { open, setOpen, isMobile, openMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   const toggleGroup = (group: string) => {
     setActiveGroup(activeGroup === group ? null : group);
+  };
+
+  const toggle = () => {
+    if (isMobile) {
+      setOpenMobile(!openMobile);
+    } else {
+      setOpen(!open);
+    }
   };
 
   const isActiveRoute = (route: string) => {
@@ -112,7 +120,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile sidebar overlay */}
-      {isOpen && (
+      {openMobile && (
         <div
           className="fixed inset-0 z-40 bg-black/30 lg:hidden"
           onClick={toggle}
@@ -122,7 +130,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-sidebar border-r border-sidebar-border shadow-sm transition-transform lg:translate-x-0 lg:relative lg:top-auto lg:z-auto ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          openMobile ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header with logo */}
@@ -131,7 +139,7 @@ const Sidebar = () => {
             to="/"
             className="flex items-center gap-2 font-semibold text-sidebar-foreground"
           >
-            <Bank className="h-5 w-5" />
+            <BuildingBank className="h-5 w-5" />
             <span>FinanceGuru</span>
           </NavLink>
           <Button
