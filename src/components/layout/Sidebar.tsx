@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ArrowLeftRight,
-  BuildingBank,
+  Building,
   BarChart3,
   BookOpen,
   ChevronRight,
@@ -139,7 +139,7 @@ const Sidebar = () => {
             to="/"
             className="flex items-center gap-2 font-semibold text-sidebar-foreground"
           >
-            <BuildingBank className="h-5 w-5" />
+            <Building className="h-5 w-5" />
             <span>FinanceGuru</span>
           </NavLink>
           <Button

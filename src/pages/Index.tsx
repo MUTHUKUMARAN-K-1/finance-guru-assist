@@ -1,4 +1,4 @@
-import { ArrowRight, BuildingBank, BookOpen, Building, Calculator, CreditCard, Flag, GraduationCap, Home, PiggyBank } from "lucide-react";
+import { ArrowRight, Building, BookOpen, Calculator, CreditCard, Flag, GraduationCap, Home, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,7 +42,7 @@ const Index = () => {
             </div>
             <div className="hidden md:flex justify-center">
               <div className="bg-[#2563eb] rounded-lg p-8 w-[80%] aspect-square flex items-center justify-center">
-                <BuildingBank className="w-32 h-32 text-white" />
+                <Building className="w-32 h-32 text-white" />
               </div>
             </div>
           </div>
@@ -313,7 +313,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <BuildingBank className="h-6 w-6" />
+                <Building className="h-6 w-6" />
                 <span className="text-xl font-bold">FinanceGuru</span>
               </div>
               <p className="text-gray-300 mb-4">
