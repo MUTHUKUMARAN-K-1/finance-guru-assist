@@ -39,32 +39,14 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   // Check if content contains code blocks
   const hasCodeBlock = content.includes("```");
   
-  // Parse content for code blocks and links
+  // Parse content for code blocks, links, and bullet points
   const renderContent = () => {
     if (!hasCodeBlock) {
-      // Process normal text for links
-      const linkRegex = /(https?:\/\/[^\s]+)/g;
-      const parts = content.split(linkRegex);
-      
+      // Process normal text for links and bullet points
+      const parts = processTextWithLinks(content);
       return (
         <div className="leading-relaxed whitespace-pre-line">
-          {parts.map((part, i) => {
-            if (part.match(linkRegex)) {
-              return (
-                <a 
-                  key={i} 
-                  href={part} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-700 hover:underline inline-flex items-center gap-1"
-                >
-                  {part.length > 40 ? `${part.substring(0, 40)}...` : part}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              );
-            }
-            return <span key={i}>{part}</span>;
-          })}
+          {parts}
         </div>
       );
     }
@@ -85,28 +67,30 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
             <div key={index} className="my-4 rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
               <div className="flex justify-between items-center bg-slate-800 px-4 py-2 text-xs text-slate-100 font-mono">
                 <span className="font-medium">{language || "Code"}</span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-6 text-slate-100 hover:text-white hover:bg-slate-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(code);
-                      }}
-                    >
-                      {copied ? (
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{copied ? 'Copied!' : 'Copy code'}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 text-slate-100 hover:text-white hover:bg-slate-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(code);
+                        }}
+                      >
+                        {copied ? (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{copied ? 'Copied!' : 'Copy code'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <pre className="bg-slate-950 text-slate-50 p-4 overflow-x-auto text-sm font-mono">
                 <code>{code}</code>
@@ -116,31 +100,70 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
         }
       }
       
-      // Process normal text for links
-      const linkRegex = /(https?:\/\/[^\s]+)/g;
-      const parts = segment.split(linkRegex);
+      // Process normal text for links and bullet points
+      const parts = processTextWithLinks(segment);
       
       return (
         <div key={index} className="mb-3 leading-relaxed whitespace-pre-line">
-          {parts.map((part, i) => {
-            if (part.match(linkRegex)) {
-              return (
-                <a 
-                  key={i} 
-                  href={part} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-700 hover:underline inline-flex items-center gap-1"
-                >
-                  {part.length > 40 ? `${part.substring(0, 40)}...` : part}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              );
-            }
-            return <span key={i}>{part}</span>;
-          })}
+          {parts}
         </div>
       );
+    });
+  };
+  
+  // Process text to identify links and bullet points
+  const processTextWithLinks = (text: string) => {
+    // First split by new lines to handle bullet points
+    const lines = text.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+      // Check for bullet points at the start of the line
+      const bulletMatch = line.match(/^(\s*[-*•]\s+)(.*)/);
+      
+      if (bulletMatch) {
+        const [, bulletPart, restOfLine] = bulletMatch;
+        const linkParts = processLinks(restOfLine);
+        
+        return (
+          <div key={lineIndex} className="flex ml-1 mb-1.5">
+            <span className="mr-2 text-muted-foreground">{bulletPart.trim()}</span>
+            <span>{linkParts}</span>
+          </div>
+        );
+      }
+      
+      // Process links in regular text
+      const linkParts = processLinks(line);
+      
+      return (
+        <div key={lineIndex} className={lineIndex > 0 ? "mt-2" : ""}>
+          {linkParts}
+        </div>
+      );
+    });
+  };
+  
+  // Process text to render links
+  const processLinks = (text: string) => {
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(linkRegex);
+    
+    return parts.map((part, i) => {
+      if (part.match(linkRegex)) {
+        return (
+          <a 
+            key={i} 
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:text-blue-700 hover:underline inline-flex items-center gap-1"
+          >
+            {part.length > 40 ? `${part.substring(0, 40)}...` : part}
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        );
+      }
+      return <span key={i}>{part}</span>;
     });
   };
 
@@ -178,23 +201,25 @@ const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
             
             {role === "assistant" && (
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      onClick={() => copyToClipboard(content)}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      {copied ? (
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{copied ? 'Copied!' : 'Copy message'}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button 
+                        onClick={() => copyToClipboard(content)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        {copied ? (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{copied ? 'Copied!' : 'Copy message'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             )}
           </div>

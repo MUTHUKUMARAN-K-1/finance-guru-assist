@@ -1,98 +1,250 @@
 
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import {
-  BarChart, 
-  Briefcase, 
-  BookOpen, 
-  Calendar, 
-  ChevronRight, 
-  FolderArchive, 
-  LayoutDashboard, 
-  LineChart, 
-  MessageSquare, 
-  Target
-} from "lucide-react";
-import { 
-  Sidebar as ShadcnSidebar, 
-  SidebarContent, 
-  SidebarFooter, 
-  SidebarHeader, 
-  SidebarMenu, 
-  SidebarMenuItem, 
-  SidebarMenuButton
-} from "@/components/ui/sidebar";
+import { useState } from "react";
+import { useLocation, NavLink } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ArrowLeftRight,
+  Bank,
+  BarChart3,
+  BookOpen,
+  ChevronRight,
+  CreditCard,
+  FolderKanban,
+  GraduationCap,
+  HelpCircle,
+  Home,
+  LineChart,
+  Menu,
+  MessagesSquare,
+  PiggyBank,
+  Target,
+  User,
+} from "lucide-react";
 
 const Sidebar = () => {
+  const { isOpen, toggle } = useSidebar();
   const location = useLocation();
-  
-  // Menu items data
-  const menuItems = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    { name: "Budget", path: "/budget", icon: BarChart },
-    { name: "Investments", path: "/investments", icon: LineChart },
-    { name: "Goals", path: "/goals", icon: Target },
-    { name: "Stocks", path: "/stocks", icon: Briefcase },
-    { name: "Education", path: "/education", icon: BookOpen },
-    { name: "Resources", path: "/resources", icon: FolderArchive },
-    { name: "AI Advisor", path: "/advisor", icon: MessageSquare },
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+
+  const toggleGroup = (group: string) => {
+    setActiveGroup(activeGroup === group ? null : group);
+  };
+
+  const isActiveRoute = (route: string) => {
+    if (route === "/" && location.pathname === "/") return true;
+    if (route !== "/" && location.pathname.startsWith(route)) return true;
+    return false;
+  };
+
+  const navigationItems = [
+    {
+      title: "Dashboard",
+      icon: <Home className="h-5 w-5" />,
+      href: "/dashboard",
+    },
+    {
+      title: "Budgeting",
+      icon: <CreditCard className="h-5 w-5" />,
+      isGroup: true,
+      items: [
+        {
+          title: "Budget Overview",
+          href: "/budget",
+        },
+        {
+          title: "Budget Calculator",
+          href: "/budget-calculator",
+        },
+      ],
+    },
+    {
+      title: "Investments",
+      icon: <PiggyBank className="h-5 w-5" />,
+      isGroup: true,
+      items: [
+        {
+          title: "Investment Overview",
+          href: "/investments",
+        },
+        {
+          title: "Investment Calculator",
+          href: "/investment-calculator",
+        },
+        {
+          title: "Stocks",
+          href: "/stocks",
+        },
+      ],
+    },
+    {
+      title: "Goals",
+      icon: <Target className="h-5 w-5" />,
+      href: "/goals",
+    },
+    {
+      title: "Education",
+      icon: <GraduationCap className="h-5 w-5" />,
+      isGroup: true,
+      items: [
+        {
+          title: "Educational Resources",
+          href: "/education",
+        },
+        {
+          title: "Learning Hub",
+          href: "/learning-hub",
+        },
+        {
+          title: "Resource Library",
+          href: "/resources",
+        },
+      ],
+    },
+    {
+      title: "AI Advisor",
+      icon: <MessagesSquare className="h-5 w-5" />,
+      href: "/advisor",
+    },
   ];
 
   return (
-    <ShadcnSidebar>
-      <SidebarHeader className="border-b p-4 flex items-center">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">FG</span>
-          </div>
-          <span className="font-bold text-lg">FinanceGuru</span>
-        </Link>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <div className="py-2">
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      "flex items-center gap-3 p-2 rounded-md transition-colors",
-                      location.pathname === item.path 
-                        ? "bg-primary/10 text-primary"
-                        : "hover:bg-muted"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+    <>
+      {/* Mobile sidebar overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 lg:hidden"
+          onClick={toggle}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-sidebar border-r border-sidebar-border shadow-sm transition-transform lg:translate-x-0 lg:relative lg:top-auto lg:z-auto ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Header with logo */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
+          <NavLink
+            to="/"
+            className="flex items-center gap-2 font-semibold text-sidebar-foreground"
+          >
+            <Bank className="h-5 w-5" />
+            <span>FinanceGuru</span>
+          </NavLink>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={toggle}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
         </div>
-      </SidebarContent>
-      
-      <SidebarFooter className="border-t p-4">
-        <div className="space-y-4">
-          <div className="bg-primary/10 rounded-lg p-4">
-            <h4 className="font-medium text-sm flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Financial Tip
-            </h4>
-            <p className="text-xs mt-2 text-muted-foreground">
-              Set up an emergency fund with 3-6 months of expenses for financial security.
-            </p>
-            <Button variant="link" size="sm" className="mt-1 h-auto p-0 text-xs">
-              <span>Learn more</span>
-              <ChevronRight className="h-3 w-3 ml-1" />
+
+        {/* Sidebar content */}
+        <ScrollArea className="flex-1 py-3">
+          <div className="space-y-1 px-2">
+            {navigationItems.map((item, index) => (
+              <div key={index}>
+                {item.isGroup ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-between ${
+                        item.items?.some((subItem) =>
+                          isActiveRoute(subItem.href)
+                        )
+                          ? "text-sidebar-primary bg-sidebar-accent/10"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/10 hover:text-sidebar-primary"
+                      }`}
+                      onClick={() => toggleGroup(item.title)}
+                    >
+                      <div className="flex items-center">
+                        {item.icon}
+                        <span className="ml-2">{item.title}</span>
+                      </div>
+                      <ChevronRight
+                        className={`h-4 w-4 transition-transform ${
+                          activeGroup === item.title ? "rotate-90" : ""
+                        }`}
+                      />
+                    </Button>
+                    {activeGroup === item.title && (
+                      <div className="pl-9 space-y-1 mt-1">
+                        {item.items?.map((subItem, subIndex) => (
+                          <NavLink
+                            key={subIndex}
+                            to={subItem.href}
+                            className={({ isActive }) =>
+                              `block px-3 py-2 rounded-md text-sm ${
+                                isActive
+                                  ? "bg-sidebar-accent/20 text-sidebar-primary font-medium"
+                                  : "text-sidebar-foreground hover:bg-sidebar-accent/10 hover:text-sidebar-primary"
+                              }`
+                            }
+                          >
+                            {subItem.title}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <NavLink
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `flex items-center px-3 py-2 rounded-md ${
+                        isActive
+                          ? "bg-sidebar-accent/20 text-sidebar-primary font-medium"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/10 hover:text-sidebar-primary"
+                      }`
+                    }
+                  >
+                    {item.icon}
+                    <span className="ml-2">{item.title}</span>
+                  </NavLink>
+                )}
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+
+        {/* Footer with help and settings */}
+        <div className="border-t border-sidebar-border p-4">
+          <div className="flex justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HelpCircle className="h-4 w-4 mr-2" />
+              Help
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Account
             </Button>
           </div>
         </div>
-      </SidebarFooter>
-    </ShadcnSidebar>
+      </aside>
+
+      {/* Mobile toggle button */}
+      <Button
+        variant="outline"
+        size="icon"
+        className="fixed bottom-4 right-4 h-10 w-10 rounded-full shadow-lg z-50 lg:hidden bg-background"
+        onClick={toggle}
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+    </>
   );
 };
 
