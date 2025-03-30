@@ -1,9 +1,9 @@
 
 import { useState } from "react";
-import { LightbulbIcon, InfoIcon } from "lucide-react";
+import { LightbulbIcon, InfoIcon, Calculator, PiggyBank } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import BudgetCalculator from "./BudgetCalculator";
+import BudgetCalculator from "@/components/budget/budget-calculator";
 import { CustomTooltip } from "@/components/ui/custom-tooltip";
 
 export default function Budget() {
@@ -19,13 +19,7 @@ export default function Budget() {
       <Tabs defaultValue="calculator" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="calculator" className="flex gap-2 items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="4" y="2" width="16" height="20" rx="2" />
-              <line x1="12" x2="12" y1="14" y2="14" />
-              <line x1="12" x2="12" y1="18" y2="18" />
-              <line x1="8" x2="16" y1="10" y2="10" />
-              <line x1="8" x2="16" y1="6" y2="6" />
-            </svg>
+            <Calculator className="h-4 w-4" />
             Budget Calculator
           </TabsTrigger>
           <TabsTrigger value="tips" className="flex gap-2 items-center">
@@ -99,11 +93,7 @@ export default function Budget() {
 
               <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
                 <h3 className="text-lg font-medium text-blue-800 mb-2 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-blue-600">
-                    <line x1="9" y1="18" x2="15" y2="18"></line>
-                    <line x1="10" y1="22" x2="14" y2="22"></line>
-                    <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
-                  </svg>
+                  <PiggyBank className="h-5 w-5 mr-1 text-blue-600" />
                   Pro Tip
                 </h3>
                 <p className="text-blue-700">

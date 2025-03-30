@@ -1,444 +1,252 @@
 
 import { useState } from "react";
-import { ArrowRight, PiggyBank, Calculator, Briefcase, TrendingUp, Sliders } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
-import { investmentAccounts, investmentGrowthData } from "@/data/mockData";
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend,
-  PieChart,
-  Pie,
-  Cell
-} from "recharts";
+import { Calculator, Search, BookOpen, Brain, CheckCircle, AlertTriangle, TrendingUp } from "lucide-react";
+import InvestmentCalculator from "@/components/investment/investment-calculator";
+import StockLookup from "@/components/investment/stock-lookup";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 
-const COLORS = ['#1e40af', '#0369a1', '#059669'];
-
-const Investments = () => {
-  const [initialInvestment, setInitialInvestment] = useState(10000);
-  const [monthlyContribution, setMonthlyContribution] = useState(500);
-  const [years, setYears] = useState(30);
-  const [interestRate, setInterestRate] = useState(8);
-  const [projectionData, setProjectionData] = useState(investmentGrowthData);
-  
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-  
-  const formatPercentage = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'percent',
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    }).format(value / 100);
-  };
-  
-  // Total portfolio value
-  const totalPortfolioValue = investmentAccounts.reduce((sum, account) => sum + account.balance, 0);
-  
-  // Calculate projections (simplified for this demo)
-  const calculateProjections = () => {
-    const data = [];
-    let balance = initialInvestment;
-    
-    for (let year = 0; year <= years; year += 5) {
-      data.push({
-        year,
-        value: Math.round(balance)
-      });
-      
-      // Calculate next 5 years of growth
-      const yearlyContribution = monthlyContribution * 12;
-      for (let i = 0; i < 5; i++) {
-        balance = (balance + yearlyContribution) * (1 + interestRate / 100);
-      }
-    }
-    
-    setProjectionData(data);
-  };
-  
-  // Calculate final value for display
-  const finalValue = projectionData[projectionData.length - 1]?.value || 0;
-  const totalContributions = initialInvestment + (monthlyContribution * 12 * years);
-  const totalGrowth = finalValue - totalContributions;
-  
+export default function Investments() {
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-        <h1 className="text-2xl font-bold tracking-tight">Investment Planning</h1>
-        <div className="flex items-center space-x-2">
-          <Button>
-            <PiggyBank className="mr-2 h-4 w-4" />
-            New Investment Goal
-          </Button>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-neutral-800 mb-2">Investment Planning</h1>
+        <p className="text-neutral-600">Learn how to grow your wealth through smart investing strategies</p>
       </div>
-      
-      {/* Portfolio Summary */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        {investmentAccounts.map((account, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+
+      <Tabs defaultValue="calculator" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="calculator" className="flex items-center">
+            <Calculator className="mr-2 h-4 w-4" />
+            Investment Calculator
+          </TabsTrigger>
+          <TabsTrigger value="stocks" className="flex items-center">
+            <Search className="mr-2 h-4 w-4" />
+            Stock Lookup
+          </TabsTrigger>
+          <TabsTrigger value="basics" className="flex items-center">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Investment Basics
+          </TabsTrigger>
+          <TabsTrigger value="strategies" className="flex items-center">
+            <Brain className="mr-2 h-4 w-4" />
+            Investment Strategies
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calculator">
+          <InvestmentCalculator />
+        </TabsContent>
+        
+        <TabsContent value="stocks">
+          <StockLookup />
+        </TabsContent>
+        
+        <TabsContent value="basics">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <BookOpen className="mr-2 h-5 w-5" />
+                Investment Fundamentals
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
-              <div className="flex justify-between mt-1">
-                <p className="text-xs text-muted-foreground">YTD Return</p>
-                <p className="text-xs font-medium text-finance-success">+{account.performance.yearly}%</p>
-              </div>
-              <div className="mt-3">
-                <div className="text-xs text-muted-foreground mb-1">Asset Allocation</div>
-                <div className="grid grid-cols-3 gap-1 text-xs">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-finance-primary rounded-full mr-1"></div>
-                    <span>Stocks: {account.allocation.stocks}%</span>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Types of Investments</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Stocks</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Represent ownership in a company. Potential for high returns but also higher risk due to market volatility.
+                    </p>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-finance-secondary rounded-full mr-1"></div>
-                    <span>Bonds: {account.allocation.bonds}%</span>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Bonds</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Loans to companies or governments. Generally lower risk than stocks with more predictable returns.
+                    </p>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-finance-accent rounded-full mr-1"></div>
-                    <span>Cash: {account.allocation.cash}%</span>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Mutual Funds</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Pooled investments managed by professionals. Offer diversification and convenience.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">ETFs</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Similar to mutual funds but trade like stocks. Typically have lower fees and more tax efficiency.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Real Estate</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Property investments. Can generate income through rental payments and appreciation over time.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Retirement Accounts</h4>
+                    <p className="text-neutral-600 text-sm">
+                      Tax-advantaged accounts like 401(k)s and IRAs designed for long-term retirement savings.
+                    </p>
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">Key Investment Concepts</h3>
+                <ul className="space-y-3">
+                  <li className="flex">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium">Compound Interest:</span>
+                      <p className="text-neutral-600">Interest earned on both the initial principal and accumulated interest over time.</p>
+                    </div>
+                  </li>
+                  <li className="flex">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium">Diversification:</span>
+                      <p className="text-neutral-600">Spreading investments across different asset classes to reduce risk.</p>
+                    </div>
+                  </li>
+                  <li className="flex">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium">Risk vs. Return:</span>
+                      <p className="text-neutral-600">Higher potential returns typically come with higher risk of losses.</p>
+                    </div>
+                  </li>
+                  <li className="flex">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium">Dollar-Cost Averaging:</span>
+                      <p className="text-neutral-600">Investing fixed amounts at regular intervals regardless of market conditions.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                <h3 className="text-lg font-medium text-blue-800 mb-2 flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
+                  Getting Started
+                </h3>
+                <ol className="list-decimal pl-5 space-y-1 text-blue-700">
+                  <li>Set clear investment goals and time horizon</li>
+                  <li>Establish an emergency fund before investing</li>
+                  <li>Pay off high-interest debt first</li>
+                  <li>Start with retirement accounts for tax advantages</li>
+                  <li>Consider low-cost index funds for beginners</li>
+                </ol>
               </div>
             </CardContent>
           </Card>
-        ))}
+        </TabsContent>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Portfolio</CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalPortfolioValue)}</div>
-            <div className="text-xs text-muted-foreground mt-2">Asset Allocation</div>
-            <div className="h-[80px] mt-1">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'Stocks', value: 75 },
-                      { name: 'Bonds', value: 20 },
-                      { name: 'Cash', value: 5 }
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={25}
-                    outerRadius={35}
-                    fill="#8884d8"
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {COLORS.map((color, index) => (
-                      <Cell key={`cell-${index}`} fill={color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `${value}%`} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="grid grid-cols-3 gap-1 text-xs mt-1">
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-finance-primary rounded-full mr-1"></div>
-                <span>Stocks: 75%</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-finance-secondary rounded-full mr-1"></div>
-                <span>Bonds: 20%</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-finance-accent rounded-full mr-1"></div>
-                <span>Cash: 5%</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Investment Calculator */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
-            Investment Growth Calculator
-          </CardTitle>
-          <CardDescription>
-            Project your investment growth over time based on different parameters
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="calculator" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="calculator">Calculator</TabsTrigger>
-              <TabsTrigger value="chart">Growth Chart</TabsTrigger>
-              <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="calculator" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="initial-investment">Initial Investment</Label>
-                  <div className="flex items-center">
-                    <span className="bg-muted px-3 py-2 border border-r-0 rounded-l-md">$</span>
-                    <Input
-                      id="initial-investment"
-                      type="number"
-                      value={initialInvestment}
-                      onChange={(e) => setInitialInvestment(Number(e.target.value))}
-                      className="rounded-l-none"
-                    />
+        <TabsContent value="strategies">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Brain className="h-5 w-5 mr-2" />
+                Investment Strategies
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Common Investment Approaches</h3>
+                <div className="space-y-4">
+                  <div className="border rounded-md p-4">
+                    <h4 className="font-medium text-neutral-800 mb-1">Buy and Hold</h4>
+                    <p className="text-neutral-600">
+                      Purchasing investments and holding them for the long term regardless of market fluctuations.
+                      Best for: Long-term investors who want to minimize transaction costs and taxes.
+                    </p>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="monthly-contribution">Monthly Contribution</Label>
-                  <div className="flex items-center">
-                    <span className="bg-muted px-3 py-2 border border-r-0 rounded-l-md">$</span>
-                    <Input
-                      id="monthly-contribution"
-                      type="number"
-                      value={monthlyContribution}
-                      onChange={(e) => setMonthlyContribution(Number(e.target.value))}
-                      className="rounded-l-none"
-                    />
+                  <div className="border rounded-md p-4">
+                    <h4 className="font-medium text-neutral-800 mb-1">Value Investing</h4>
+                    <p className="text-neutral-600">
+                      Seeking stocks that appear undervalued relative to their intrinsic value.
+                      Best for: Patient investors who can identify undervalued opportunities.
+                    </p>
+                  </div>
+                  <div className="border rounded-md p-4">
+                    <h4 className="font-medium text-neutral-800 mb-1">Growth Investing</h4>
+                    <p className="text-neutral-600">
+                      Focusing on companies with high growth potential, often at higher valuations.
+                      Best for: Investors comfortable with volatility and seeking higher returns.
+                    </p>
+                  </div>
+                  <div className="border rounded-md p-4">
+                    <h4 className="font-medium text-neutral-800 mb-1">Passive Investing</h4>
+                    <p className="text-neutral-600">
+                      Using index funds or ETFs to match market returns rather than trying to beat the market.
+                      Best for: Most individual investors seeking low-cost, diversified exposure.
+                    </p>
                   </div>
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="years-slider">Investment Period: {years} years</Label>
-                    <span className="text-xs text-muted-foreground">1 - 50 years</span>
-                  </div>
-                  <Slider
-                    id="years-slider"
-                    defaultValue={[years]}
-                    min={1}
-                    max={50}
-                    step={1}
-                    onValueChange={(value) => setYears(value[0])}
-                    className="mt-2"
-                  />
-                </div>
-                
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="interest-slider">Expected Annual Return: {interestRate}%</Label>
-                    <span className="text-xs text-muted-foreground">1% - 15%</span>
-                  </div>
-                  <Slider
-                    id="interest-slider"
-                    defaultValue={[interestRate]}
-                    min={1}
-                    max={15}
-                    step={0.5}
-                    onValueChange={(value) => setInterestRate(value[0])}
-                    className="mt-2"
-                  />
-                </div>
-              </div>
-              
-              <Button onClick={calculateProjections} className="w-full">
-                Calculate Investment Growth
-              </Button>
-            </TabsContent>
-            
-            <TabsContent value="chart">
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={projectionData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="year" 
-                      label={{ value: 'Years', position: 'insideBottomRight', offset: -10 }} 
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => formatCurrency(value)}
-                      width={80}
-                    />
-                    <Tooltip formatter={(value) => formatCurrency(value as number)} />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="value" 
-                      name="Projected Value" 
-                      stroke="#1e40af" 
-                      fill="#1e40af" 
-                      fillOpacity={0.3} 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                <div className="border rounded-md p-4">
-                  <h4 className="text-sm font-medium text-muted-foreground">Initial Investment</h4>
-                  <p className="text-lg font-bold mt-1">{formatCurrency(initialInvestment)}</p>
-                </div>
-                <div className="border rounded-md p-4">
-                  <h4 className="text-sm font-medium text-muted-foreground">Total Contributions</h4>
-                  <p className="text-lg font-bold mt-1">{formatCurrency(totalContributions)}</p>
-                </div>
-                <div className="border rounded-md p-4">
-                  <h4 className="text-sm font-medium text-muted-foreground">Investment Growth</h4>
-                  <p className="text-lg font-bold mt-1 text-finance-success">{formatCurrency(totalGrowth)}</p>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="breakdown">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Final Value Breakdown</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[200px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={[
-                                { name: 'Initial Investment', value: initialInvestment },
-                                { name: 'Contributions', value: totalContributions - initialInvestment },
-                                { name: 'Investment Growth', value: totalGrowth }
-                              ]}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="value"
-                              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            >
-                              <Cell fill="#1e40af" />
-                              <Cell fill="#0369a1" />
-                              <Cell fill="#059669" />
-                            </Pie>
-                            <Tooltip formatter={(value) => formatCurrency(value as number)} />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Key Figures</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center border-b pb-2">
-                          <p className="text-sm font-medium">Initial Investment</p>
-                          <p className="font-bold">{formatCurrency(initialInvestment)}</p>
-                        </div>
-                        <div className="flex justify-between items-center border-b pb-2">
-                          <p className="text-sm font-medium">Monthly Contribution</p>
-                          <p className="font-bold">{formatCurrency(monthlyContribution)}</p>
-                        </div>
-                        <div className="flex justify-between items-center border-b pb-2">
-                          <p className="text-sm font-medium">Investment Period</p>
-                          <p className="font-bold">{years} years</p>
-                        </div>
-                        <div className="flex justify-between items-center border-b pb-2">
-                          <p className="text-sm font-medium">Annual Return Rate</p>
-                          <p className="font-bold">{formatPercentage(interestRate)}</p>
-                        </div>
-                        <div className="flex justify-between items-center pt-1">
-                          <p className="text-sm font-medium">Final Value</p>
-                          <p className="font-bold text-lg text-finance-primary">{formatCurrency(finalValue)}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Investment Strategy Recommendations</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-2">
-                        <div className="bg-finance-primary/10 p-2 rounded-full text-finance-primary">
-                          <TrendingUp className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">Consistent Contributions Matter</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Regular monthly contributions of {formatCurrency(monthlyContribution)} lead to significant
-                            growth over time due to compound interest.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-2">
-                        <div className="bg-finance-accent/10 p-2 rounded-full text-finance-accent">
-                          <Sliders className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">Portfolio Allocation</h4>
-                          <p className="text-sm text-muted-foreground">
-                            For a {years}-year investment horizon, consider a diversified portfolio with
-                            {years > 20 ? " 80-90% stocks and 10-20% bonds." : 
-                             years > 10 ? " 70-80% stocks and 20-30% bonds." : 
-                             " 60-70% stocks and 30-40% bonds."}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-2">
-                        <div className="bg-finance-secondary/10 p-2 rounded-full text-finance-secondary">
-                          <Calculator className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">Investment Growth</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Your initial investment of {formatCurrency(initialInvestment)} could grow to 
-                            approximately {formatCurrency(finalValue)} over {years} years, 
-                            representing a {formatPercentage((finalValue - initialInvestment) / initialInvestment)} total return.
-                          </p>
-                        </div>
-                      </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">Asset Allocation Models</h3>
+                <p className="text-neutral-600 mb-4">
+                  Your asset allocation should reflect your risk tolerance and time horizon. Here are some common models:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Conservative</h4>
+                    <div className="h-32 flex items-end space-x-1 mt-3">
+                      <div className="bg-blue-300 w-2/3 h-4/5 rounded-t" title="Bonds: 60-70%"></div>
+                      <div className="bg-green-500 w-1/4 h-1/4 rounded-t" title="Stocks: 20-30%"></div>
+                      <div className="bg-gray-400 w-1/6 h-1/5 rounded-t" title="Cash: 10%"></div>
                     </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      Explore More Investment Strategies
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardFooter>
-                </Card>
+                    <p className="text-neutral-600 text-sm mt-2">
+                      Low risk, stable returns. Good for short time horizons or risk-averse investors.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Moderate</h4>
+                    <div className="h-32 flex items-end space-x-1 mt-3">
+                      <div className="bg-blue-300 w-1/2 h-1/2 rounded-t" title="Bonds: 40-50%"></div>
+                      <div className="bg-green-500 w-5/12 h-4/5 rounded-t" title="Stocks: 40-50%"></div>
+                      <div className="bg-gray-400 w-1/12 h-1/6 rounded-t" title="Cash: 5-10%"></div>
+                    </div>
+                    <p className="text-neutral-600 text-sm mt-2">
+                      Balanced approach with moderate risk and growth. Good for medium time horizons.
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-neutral-800 mb-1">Aggressive</h4>
+                    <div className="h-32 flex items-end space-x-1 mt-3">
+                      <div className="bg-blue-300 w-1/4 h-1/4 rounded-t" title="Bonds: 20-30%"></div>
+                      <div className="bg-green-500 w-2/3 h-4/5 rounded-t" title="Stocks: 70-80%"></div>
+                      <div className="bg-gray-400 w-1/12 h-1/12 rounded-t" title="Cash: 0-5%"></div>
+                    </div>
+                    <p className="text-neutral-600 text-sm mt-2">
+                      Higher potential returns with higher risk. Best for long time horizons.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+
+              <div className="bg-amber-50 p-4 rounded-md border border-amber-100">
+                <h3 className="text-lg font-medium text-amber-800 mb-2 flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-2 text-amber-600" />
+                  Important Considerations
+                </h3>
+                <ul className="list-disc pl-5 space-y-1 text-amber-700">
+                  <li>Fees and expenses can significantly impact long-term returns</li>
+                  <li>Tax implications vary by investment type and account</li>
+                  <li>Your asset allocation should become more conservative as you approach your goal</li>
+                  <li>Regular rebalancing helps maintain your desired risk level</li>
+                  <li>Past performance does not guarantee future results</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-};
-
-export default Investments;
+}
