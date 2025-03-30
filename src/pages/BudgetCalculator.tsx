@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Calculator, DollarSign, PieChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,7 +170,8 @@ const BudgetCalculator = () => {
             Budget Calculator
           </TabsTrigger>
           <TabsTrigger value="tips" className="flex gap-2 items-center">
-            <Tooltip content="Budgeting Tips" />
+            <PieChart className="h-4 w-4" />
+            Budgeting Tips
           </TabsTrigger>
         </TabsList>
         

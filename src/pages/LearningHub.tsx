@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, BookOpen, GraduationCap, FileText, ArrowRight, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,30 +32,32 @@ const LearningHub = () => {
       {/* Navigation Tabs */}
       <Tabs defaultValue="resources" className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <TabsTrigger value="resources" className="flex items-center justify-center gap-2 py-6 h-auto">
-            <BookOpen className="h-5 w-5" />
-            <span>Learning Resources</span>
-          </TabsTrigger>
-          <TabsTrigger value="case-studies" className="flex items-center justify-center gap-2 py-6 h-auto">
-            <FileText className="h-5 w-5" />
-            <span>Case Studies</span>
-          </TabsTrigger>
-          <TabsTrigger value="tools" className="flex items-center justify-center gap-2 py-6 h-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bar-chart">
-              <line x1="12" x2="12" y1="20" y2="10" />
-              <line x1="18" x2="18" y1="20" y2="4" />
-              <line x1="6" x2="6" y1="20" y2="16" />
-            </svg>
-            <span>Interactive Tools</span>
-          </TabsTrigger>
-          <TabsTrigger value="additional" className="flex items-center justify-center gap-2 py-6 h-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-square">
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M12 8v8" />
-              <path d="M8 12h8" />
-            </svg>
-            <span>Additional Resources</span>
-          </TabsTrigger>
+          <TabsList className="w-full">
+            <TabsTrigger value="resources" className="flex items-center justify-center gap-2 py-6 h-auto flex-1">
+              <BookOpen className="h-5 w-5" />
+              <span>Learning Resources</span>
+            </TabsTrigger>
+            <TabsTrigger value="case-studies" className="flex items-center justify-center gap-2 py-6 h-auto flex-1">
+              <FileText className="h-5 w-5" />
+              <span>Case Studies</span>
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="flex items-center justify-center gap-2 py-6 h-auto flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bar-chart">
+                <line x1="12" x2="12" y1="20" y2="10" />
+                <line x1="18" x2="18" y1="20" y2="4" />
+                <line x1="6" x2="6" y1="20" y2="16" />
+              </svg>
+              <span>Interactive Tools</span>
+            </TabsTrigger>
+            <TabsTrigger value="additional" className="flex items-center justify-center gap-2 py-6 h-auto flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-square">
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M12 8v8" />
+                <path d="M8 12h8" />
+              </svg>
+              <span>Additional Resources</span>
+            </TabsTrigger>
+          </TabsList>
         </div>
         
         <TabsContent value="resources">
@@ -184,11 +185,11 @@ const LearningHub = () => {
                   <CardHeader>
                     <div className="flex items-center gap-2 mb-2">
                       <Badge className={
-                        caseStudy.category === "investing" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : 
-                        caseStudy.category === "budgeting" ? "bg-green-100 text-green-800 hover:bg-green-100" : 
+                        caseStudy.type === "investing" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : 
+                        caseStudy.type === "budgeting" ? "bg-green-100 text-green-800 hover:bg-green-100" : 
                         "bg-orange-100 text-orange-800 hover:bg-orange-100"
                       }>
-                        {caseStudy.category}
+                        {caseStudy.type}
                       </Badge>
                     </div>
                     <CardTitle>{caseStudy.title}</CardTitle>
