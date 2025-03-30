@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, BookOpen, GraduationCap, FileText, ArrowRight, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { educationalResources } from "@/data/mockData";
+import { CustomTooltip } from "@/components/ui/custom-tooltip";
 
 const LearningHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,22 +108,15 @@ const LearningHub = () => {
                   <CardHeader className="pb-2">
                     <div className="flex justify-between">
                       <div className="flex items-center gap-2">
-                        {tutorial.category === "budgeting" ? (
-                          <div className="p-2 bg-blue-100 rounded-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                        <div className={`p-2 ${index % 2 === 0 ? "bg-blue-100" : "bg-green-100"} rounded-md`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={index % 2 === 0 ? "text-blue-600" : "text-green-600"}>
+                            {index % 2 === 0 ? (
                               <path d="M3 9h18v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
-                              <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
-                              <path d="M9 13h6" />
-                              <path d="M12 16V7" />
-                            </svg>
-                          </div>
-                        ) : (
-                          <div className="p-2 bg-green-100 rounded-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                            ) : (
                               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                            </svg>
-                          </div>
-                        )}
+                            )}
+                          </svg>
+                        </div>
                         <CardTitle className="text-lg">{tutorial.title}</CardTitle>
                       </div>
                       <Badge variant="outline" className="font-normal">
@@ -185,11 +180,11 @@ const LearningHub = () => {
                   <CardHeader>
                     <div className="flex items-center gap-2 mb-2">
                       <Badge className={
-                        caseStudy.type === "investing" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : 
-                        caseStudy.type === "budgeting" ? "bg-green-100 text-green-800 hover:bg-green-100" : 
-                        "bg-orange-100 text-orange-800 hover:bg-orange-100"
+                        caseStudy.category === "investing" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : 
+                        caseStudy.category === "debt" ? "bg-orange-100 text-orange-800 hover:bg-orange-100" : 
+                        "bg-green-100 text-green-800 hover:bg-green-100"
                       }>
-                        {caseStudy.type}
+                        {caseStudy.category}
                       </Badge>
                     </div>
                     <CardTitle>{caseStudy.title}</CardTitle>
