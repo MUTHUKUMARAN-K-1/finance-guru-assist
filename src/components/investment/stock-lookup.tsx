@@ -15,7 +15,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
-import { fetchStockData } from "@/services/alphaVantageService";
+import { getStockQuote, getHistoricalData } from "@/services/alphaVantageService";
 
 const StockLookup = () => {
   const [symbol, setSymbol] = useState("");
@@ -39,8 +39,11 @@ const StockLookup = () => {
     setError("");
     
     try {
-      const data = await fetchStockData(symbol);
-      setStockData(data);
+      const quoteData = await getStockQuote(symbol);
+      if (!quoteData) {
+        throw new Error("Unable to fetch stock data");
+      }
+      setStockData(quoteData);
     } catch (err) {
       setError("Error fetching stock data. Please try again or check the symbol.");
       setStockData(null);
